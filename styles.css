@@ -231,9 +231,19 @@ navbar a:hover {
     padding: 5rem;
     font-size: medium;
 }
-.preço{
-    color: wheat;
-    font-size: small;
+.menu .menu-cardapio .cardapio:hover{
+    background-color: bisque; 
+}
+.menu .menu-cardapio .cardapio img{
+    height:7rem;
+
+}
+.preço{ 
+    color: rgb(255, 255, 255);
+    font-size:  larger;
+}
+.menu .menu-cardapio .cardapio:hover>*{
+    color:var(--black);
 }
 
 

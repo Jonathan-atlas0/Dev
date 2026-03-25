@@ -11,13 +11,20 @@
 
 </head>
 <body>
+   <?php 
+    include_once("Conexao.php");
+    $nome=$_SESSION['nome']; 
+    $dados = mysqli_query($conn,"SELECT * FROM tabela WHERE Nome='$nome' ");
+    
+    ?>
     <div class="caixa-video">
         <div class="mascara"></div>
+              <img src="./img/images_1.jpg" alt="dadqa" >
     </div>
     <header class="header">
        <section>
-            <a href="#"> 
-                <img src="./img/logo.png" alt="logo.cafeteria">
+            <a>
+
             </a>
             <nav class="navbar">
                 <a href="index.html">Home</a>
@@ -26,31 +33,54 @@
              </nav> 
 
             <div class="icons"> 
-                <img widht="30" hight="30" src="https://img.icons8.com/ios-glyphs/30/ffffff/shopping-cart--v1.png"
+                <img widht="30" hight="30" src="./img/shopping-cart--v1.png"
                 alt="shopping-cart--v1"> 
+                 <a href="Login.php">
+                <img src="./img/icone-login1.png"alt="shopping-cart--v1" style="width: 30px; height: 30px;"></a>
+                
             </div>  
        </section>   
     </header>
 
       <section class="menu">
             <div>
-            <h3 class="titulo">SEU <Span>CARRINHO</Span></h3>
+            <h3 class="titulo">SEU <Span>CARRINHO </Span><?php echo $nome ?></h3>
             </div>
         </section>
-<!-- Vamos colocar os itens do carrinho aqui-->
- <?php
- $produto =$_POST['produto'];
- $valor = $_POST['valor'];
- $imagem =$_POST['imagem'];
- $imagemS = "<img src='$imagem'>";
- ?>
-    <section class="menu" id="menu">   
+ 
+
+
+    <section class="menu" id="menu">
             <div class="menu-cardapio">
-                 <div class="cardapio">
-                    <img src="<?php echo $imagem; ?>">
-                    <h3><?php echo $produto ?> </h3>
-                    <div class="preço">R$ <?php echo $valor?></div>
-                 </div>
+                <?php if (mysqli_num_rows($dados) > 0) { ?>
+                <?php  while ($tabela = mysqli_fetch_assoc($dados))  { ?>
+                   <div class="cardapio">
+                    <img src="<?php echo $tabela['Imagem']; ?>" alt="item">
+                    <h3><?php echo $tabela['Produto']; ?></h3>
+                    <div class="preço">R$ <?php echo number_format($tabela['Valor'], 2, ',', '.'); ?></div>
+                </div>
+                
+            <?php } ?>
+             <?php } else { ?>
+                <div class="cardapio">
+            <h2>Nenhum item no carrinho 😾☕</h2> 
+             </div><?php } ?>
+                  </div>
+                  <?php if(mysqli_num_rows($dados) > 0 || $nome=='Admin'){ ?>
+                  <form action="Finalizar.php">
+                    <button type="submit" class="botao-link">Finalizar pedido</button>
+                    </form>
+                    <form action="Delete.php" method="post">
+                        <button type="submit" class="botao-link">Apagar carrinho</button>
+                    </form>
+                    <?php } ?>
+    </section>
+<?php
+    if (isset($_SESSION['mensagem'])) {
+    echo "<script>alert('{$_SESSION['mensagem']}');</script>";
+    unset($_SESSION['mensagem']);
+    }
+?>
      <div class="modal">
         <h3 class="titulo"><span>Nosso</span> Endereço</h3>
         <iframe 
