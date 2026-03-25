@@ -52,8 +52,8 @@
 
     <section class="menu" id="menu">
             <div class="menu-cardapio">
-                <?php if (mysqli_num_rows($dados) > 0) { ?>
-                <?php  while ($tabela = mysqli_fetch_assoc($dados))  { ?>
+                <?php if ($total > 0) { ?>
+                <?php  foreach ($dados as $tabela) { ?>
                    <div class="cardapio">
                     <img src="<?php echo $tabela['Imagem']; ?>" alt="item">
                     <h3><?php echo $tabela['Produto']; ?></h3>
