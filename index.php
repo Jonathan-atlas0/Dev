@@ -19,14 +19,14 @@
        <section>
         <a href=""></a> <!--logo-->
             <nav class="navbar">
-                <a href="index.html">Home ☕</a>
+                <a href="index.php">Home ☕</a>
                 <a href="menu.php">Menu</a>
                 <a href="#address" onclick ="mostrarModal()">Endereço</a>
              </nav> 
 
             <div class="icons"> 
                 <a href="carrinho.php">
-                <img style="height: min-content;" widht="30" hight="30" src="./img/shopping-cart--v1.png"alt="shopping-cart--v1"></a>
+                <img style="height: min-content;" width="30" height="30" src="./img/shopping-cart--v1.png"alt="shopping-cart--v1"></a>
                 <a href="Login.php">
                 <img src="./img/icone-login1.png"alt="Login" style="width: 30px; height: 30px;"></a>
             </div>
@@ -35,7 +35,6 @@
    
 
   <h3 class="titulo" style="padding-top: 200px;">O melhor<span> CAFÉ</span> Da região</h3>
-         </div>
     <section class="caixa-principal">
             <div>
                  <section class="caixa-sobre">
@@ -43,17 +42,14 @@
                 <div class="sobre-imagem">
                     <img src="./img/B-cafe.jpg">
                 </div>
-
             <div class="sobre-texto">
-              <h3>Café de qualidade</h3>
+              <h3>Café de qualidadedadadada</h3>
                  <p>Nossos produtos são sempre entregues frescos e de alta qualidade para você. Nossos pães e doces são diariamente repostos para garantir a qualidade dos alimentos.</p>
                  <p>Nosso estabelecimento é aquecido e confortável para ser agradável e hospitalizador para lhe garantir um momento de paz e tranquilidade.</p>
                  <a href= "menu.php" class="botao-link">Peça o seu agora!</a>
             </div>
                         </div>
                     </div>
-                </p>
-            </div>
             <div>
                  <section class="caixa-sobre">
             <div class="sobre-container">
@@ -69,7 +65,6 @@
             </div>
                         </div>
                     </div>
-                </p>
             </div>
     </section>
         <section class="caixa-sobre">
@@ -78,7 +73,6 @@
                 <div class="sobre-imagem">
                     <img src="./img/images_1.jpg">
                 </div>
-
             <div class="sobre-texto">
               <h3>O que faz o nosso café especial </h3>
                  <p>Nossos produtos são sempre entregues frescos e de alta qualidade para você. Nossos pães e doces são diariamente repostos para garantir a qualidade dos alimentos.</p>
@@ -86,7 +80,6 @@
                  <a class="botao-link">Saiba mais</a>
             </div>
         </div>    
-     </section>
      </section>
 
 

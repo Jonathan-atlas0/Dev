@@ -1,3 +1,8 @@
+<?php
+include_once("Conexao.php");
+$nome = $_SESSION['nome'] ?? '';
+$dados = mysqli_query($conn,"SELECT * FROM tabela WHERE Nome='$nome' ");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,12 +16,6 @@
 
 </head>
 <body>
-   <?php 
-    include_once("Conexao.php");
-    $nome=$_SESSION['nome']; 
-    $dados = mysqli_query($conn,"SELECT * FROM tabela WHERE Nome='$nome' ");
-    
-    ?>
     <div class="caixa-video">
         <div class="mascara"></div>
               <img src="./img/images_1.jpg" alt="dadqa" >
@@ -27,7 +26,7 @@
 
             </a>
             <nav class="navbar">
-                <a href="index.html">Home</a>
+                <a href="index.php">Home</a>
                 <a href="menu.php">Menu</a>
                 <a href="#address" onclick ="mostrarModal()">Endereço</a>
              </nav> 
@@ -52,8 +51,8 @@
 
     <section class="menu" id="menu">
             <div class="menu-cardapio">
-                <?php if ($total > 0) { ?>
-                <?php  foreach ($dados as $tabela) { ?>
+                <?php if (mysqli_num_rows($dados) > 0) { ?>
+                <?php  while ($tabela = mysqli_fetch_assoc($dados))  { ?>
                    <div class="cardapio">
                     <img src="<?php echo $tabela['Imagem']; ?>" alt="item">
                     <h3><?php echo $tabela['Produto']; ?></h3>

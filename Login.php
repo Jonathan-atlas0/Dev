@@ -1,19 +1,18 @@
+<?php
+include_once("Conexao.php");
+session_unset();
+session_destroy();
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="login-style.css">
-  
     <title>Document</title>
 </head>
 <body style="background-image: url(img/cafe-login2.jpg);">
     <main class="recepiente">
-        <?php
-        include_once("Conexao.php");
-        session_unset();
-        session_destroy();  
-        ?>
         <h1>Login Cafetéria</h1>
         
       <form action="Login1.php" method="post">

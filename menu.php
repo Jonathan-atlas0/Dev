@@ -1,3 +1,7 @@
+<?php
+include_once("Conexao.php");
+$nome = $_SESSION['nome'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,10 +15,7 @@
 
 </head>
 <body>
-  <?php
-  session_start(); 
-  $nome =$_SESSION['nome'];
-  ?>
+ 
     <div class="caixa-video">
       <img src="./img/images_1.jpg" alt="dadqa" >
         <div class="mascara"></div>
@@ -24,20 +25,19 @@
             <a href="#"> 
             </a>
             <nav class="navbar">
-                <a href="index.html">Home</a>
+                <a href="index.php">Home</a>
                 <a href="menu.php">Menu ☕</a>
                 <a href="#address" onclick ="mostrarModal()">Endereço</a>
              </nav> 
 
             <div class="icons">
               <a href="carrinho.php">
-                <img style="height: min-content;" widht="30" hight="30" src="./img/shopping-cart--v1.png"alt="shopping-cart--v1"></a> 
+                <img style="height: min-content;" width="30" height="30" src="./img/shopping-cart--v1.png"alt="shopping-cart--v1"></a> 
                  <a href="Login.php">
-                <img src="./img/icone-login1.png"alt="shopping-cart--v1" style="width: 30px; height: 30px;"></a>
+                <img src="./img/icone-login1.png"alt="Login" style="width: 30px; height: 30px;"></a>
             </div>  
        </section>   
     </header>
-     </section>
 
      <section class="menu" id="menu">
             <h2 class="titulo">Nosso<span> MENU </span><?php echo $nome;?></h2>    
@@ -50,7 +50,7 @@
                      <input type="hidden" name="produto" value="Capuccino">
                      <input type="hidden" name="valor" value="15.99">
                      <input type="hidden" name="imagem" value="./img/menu-1.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
                                   <div class="cardapio">
@@ -61,7 +61,7 @@
                      <input type="hidden" name="produto" value="Mocha">
                      <input type="hidden" name="valor" value="12.59">
                      <input type="hidden" name="imagem" value="./img/menu-2.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
                                   <div class="cardapio">
@@ -72,7 +72,7 @@
                      <input type="hidden" name="produto" value="Macchiato">
                      <input type="hidden" name="valor" value="16.99">
                      <input type="hidden" name="imagem" value="./img/menu-3.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
                                   <div class="cardapio">
@@ -83,7 +83,7 @@
                      <input type="hidden" name="produto" value="café Expresso">
                      <input type="hidden" name="valor" value="10.00">
                      <input type="hidden" name="imagem" value="./img/menu-4.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
                                   <div class="cardapio">
@@ -94,7 +94,7 @@
                      <input type="hidden" name="produto" value="Leite e Caramelo">
                      <input type="hidden" name="valor" value="14.99">
                      <input type="hidden" name="imagem" value="./img/menu-5.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
                                   <div class="cardapio">
@@ -105,7 +105,7 @@
                      <input type="hidden" name="produto" value="café preto">
                      <input type="hidden" name="valor" value="18.99">
                      <input type="hidden" name="imagem" value="./img/menu-6.png">
-                     <button type="submit" class="botao-link">Adicinar ao carinho</button>
+                     <button type="submit" class="botao-link">Adicionar ao carinho</button>
                    </form>
                  </div>
             </div>
