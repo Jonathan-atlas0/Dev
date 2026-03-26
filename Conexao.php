@@ -1,8 +1,8 @@
 <?php
 session_start();
-$host = "localhost";
+$host = "db";
 $user = "root";
-$password = "";
+$password = "root";
 $bd = "cafeteria";
 
 $conn = new mysqli($host, $user, $password, $bd);
