@@ -9,7 +9,8 @@ session_destroy();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="login-style.css">
-    <title>Document</title>
+    <title>Login
+    </title>
 </head>
 <body style="background-image: url(img/cafe-login2.jpg);">
     <main class="recepiente">
@@ -27,7 +28,7 @@ session_destroy();
            <input type="checkbox">
            Lembrar senha
         </label>
-            <a href="index.html">Voltar ao menu</a>
+            <a href="index.php">Voltar ao menu</a>
       </div>
       <button type="submit" class="login">Login</button>
       <div class="register-link">
