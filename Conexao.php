@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
  
 $host = getenv("DB_HOST") ?: "db";
 $user = getenv("DB_USER") ?: "cafeteria";
