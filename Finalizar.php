@@ -1,27 +1,41 @@
 <?php
+/**
+ * Finalizar.php — refatorado com CQRS
+ * Antes: SQL de SELECT + INSERT + DELETE misturado aqui.
+ * Agora: um único Command com transação no Handler.
+ */
+
+session_start();
 include_once("Conexao.php");
-$nome = $_SESSION['nome'];
-if (!isset($nome)) { header("Location: Login.php"); exit; }
+require_once("bootstrap.php");
 
-$stmt = $conn->prepare("SELECT * FROM tabela WHERE Nome = :nome");
-$stmt->execute([':nome' => $nome]);
-$itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
+use Cafeteria\CQRS\Commands\FinalizarPedidoCommand;
+use Cafeteria\CQRS\Queries\BuscarPedidosFinalizadosQuery;
 
-$ins = $conn->prepare("INSERT INTO Finalizado(Produto, Valor, Nome) VALUES(:produto, :valor, :nome)");
-foreach ($itens as $item) {
-    $ins->execute([':produto'=>$item['produto'],':valor'=>$item['valor'],':nome'=>$item['nome']]);
+$nome = $_SESSION['nome'] ?? null;
+if (!$nome) {
+    header("Location: Login.php");
+    exit;
 }
 
+// Modo Admin: exibe todos os pedidos finalizados (leitura pura via Query)
 if (strtolower($nome) === 'admin') {
-    $fin = $conn->query("SELECT * FROM Finalizado");
-    while ($row = $fin->fetch(PDO::FETCH_ASSOC)) {
-        echo $row['produto'] . " - R$ " . $row['valor'] . " - " . $row['nome'] . "<br>";
+    $pedidos = $queryBus->dispatch(new BuscarPedidosFinalizadosQuery());
+    echo "<h2>Painel Admin — Pedidos Finalizados</h2><ul>";
+    foreach ($pedidos as $p) {
+        echo "<li>{$p['nome']} — {$p['produto']} — R$ " . number_format($p['valor'], 2, ',', '.') . "</li>";
     }
-    echo "Modo admin";
-} else {
-    $_SESSION['mensagem'] = "Pedido realizado com sucesso ☕😋";
-    $del = $conn->prepare("DELETE FROM tabela WHERE Nome = :nome");
-    $del->execute([':nome' => $nome]);
-    header("Location: carrinho.php");
+    echo "</ul>";
+    exit;
 }
-?>
+
+// Modo usuário: finaliza o pedido via Command
+try {
+    $commandBus->dispatch(new FinalizarPedidoCommand(nomeUsuario: $nome));
+    $_SESSION['mensagem'] = "Pedido realizado com sucesso ☕😋";
+} catch (\Throwable $e) {
+    $_SESSION['mensagem'] = "Erro ao finalizar: " . $e->getMessage();
+}
+
+header("Location: carrinho.php");
+exit;

@@ -1,0 +1,16 @@
+{
+    "name": "cafeteria/app",
+    "description": "Cafeteria com CQRS, Redis e WebSocket",
+    "require": {
+        "php": ">=8.2",
+        "cboden/ratchet": "^0.4",
+        "react/event-loop": "^1.4",
+        "predis/predis": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cafeteria\\": "cqrs/"
+        }
+    },
+    "minimum-stability": "stable"
+}

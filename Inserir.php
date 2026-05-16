@@ -1,13 +1,36 @@
 <?php
-include_once("Conexao.php");
-$produto = $_POST['produto'];
-$valor   = $_POST['valor'];
-$imagem  = $_POST['imagem'];
-$nome    = $_SESSION['nome'];
-if (!isset($nome)) { header("Location: Login.php"); exit; }
-$stmt = $conn->prepare("INSERT INTO tabela(Produto, Valor, Imagem, Nome) VALUES(:produto, :valor, :imagem, :nome)");
-$ok = $stmt->execute([':produto'=>$produto,':valor'=>$valor,':imagem'=>$imagem,':nome'=>$nome]);
-$_SESSION['mensagem'] = $ok ? "✅ Pedido adicionado ao carrinho!" : "Erro ao adicionar pedido.";
-header("Location: menu.php"); exit;
-?>
- 
+/**
+ * Inserir.php — refatorado com CQRS
+ * Antes: SQL direto aqui.
+ * Agora: monta o Command e despacha. Toda lógica fica no Handler.
+ */
+
+session_start();
+include_once("Conexao.php");   // fornece $conn
+require_once("bootstrap.php"); // fornece $commandBus
+
+use Cafeteria\CQRS\Commands\AdicionarAoCarrinhoCommand;
+
+$nome = $_SESSION['nome'] ?? null;
+if (!$nome) {
+    header("Location: Login.php");
+    exit;
+}
+
+try {
+    $command = new AdicionarAoCarrinhoCommand(
+        produto:     $_POST['produto'],
+        valor:       (float) $_POST['valor'],
+        imagem:      $_POST['imagem'],
+        nomeUsuario: $nome,
+    );
+
+    $commandBus->dispatch($command);
+    $_SESSION['mensagem'] = "✅ Pedido adicionado ao carrinho!";
+
+} catch (\Throwable $e) {
+    $_SESSION['mensagem'] = "Erro ao adicionar pedido: " . $e->getMessage();
+}
+
+header("Location: menu.php");
+exit;

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cafeteria_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_USER: cafeteria
+      DB_PASS: cafeteria123
+      DB_NAME: Cafeteria
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cafeteria_network
+
+  db:
+    image: postgres:16
+    container_name: cafeteria_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: Cafeteria
+      POSTGRES_USER: cafeteria
+      POSTGRES_PASSWORD: cafeteria123
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cafeteria -d Cafeteria"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cafeteria_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cafeteria_pgadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cafeteria.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    depends_on:
+      - db
+    networks:
+      - cafeteria_network
+
+volumes:
+  db_data:
+
+networks:
+  cafeteria_network:
+    driver: bridge
