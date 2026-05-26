@@ -1,0 +1,15 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+
+  - job_name: 'cafeteria-php'
+    static_configs:
+      - targets: ['cafeteria_app:80']   # porta interna do Apache no container
+    metrics_path: '/metrics.php'
+    scheme: 'http'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
