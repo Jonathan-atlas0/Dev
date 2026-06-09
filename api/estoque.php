@@ -30,6 +30,30 @@ $conn->exec("CREATE TABLE IF NOT EXISTS Estoque (
     produto VARCHAR(100) UNIQUE,
     quantidade INTEGER DEFAULT 0
 )");
+$seedParam = $_GET['seed'] ?? null;
+
+// Endpoint helper: popular tabela com produtos de exemplo quando solicitado via ?seed=1
+if ($seedParam === '1' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $samples = [
+        ['produto' => 'Capucino', 'quantidade' => 10],
+        ['produto' => 'Mocha', 'quantidade' => 10],
+        ['produto' => 'Macchiato', 'quantidade' => 10],
+        ['produto' => 'Expresso', 'quantidade' => 10],
+        ['produto' => 'Leite e Caramelo', 'quantidade' => 10],
+        ['produto' => 'Cafe', 'quantidade' => 10],
+    ];
+    $ins = $conn->prepare('INSERT INTO Estoque (produto, quantidade) VALUES (:produto, :quantidade) ON CONFLICT (produto) DO NOTHING');
+    foreach ($samples as $s) {
+        $ins->execute([':produto' => $s['produto'], ':quantidade' => $s['quantidade']]);
+    }
+    $rows = [];
+    $stmt = $conn->query('SELECT produto, quantidade FROM Estoque ORDER BY produto');
+    while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) $rows[] = $r;
+    MetricsService::incrementarRequisicaoHttp('GET', $rota . '?seed=1', 201);
+    http_response_code(201);
+    echo json_encode(['mensagem' => 'Amostra inserida', 'produtos' => $rows]);
+    exit;
+}
 
 $body = json_decode(file_get_contents('php://input'), true) ?? [];
 $produto = $_GET['produto'] ?? null;

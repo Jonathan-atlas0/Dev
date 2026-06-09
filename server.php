@@ -12,7 +12,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
@@ -128,8 +128,8 @@ if (!$socket) {
 
 stream_set_blocking($socket, false);
 
-// Envia SUBSCRIBE
-fwrite($socket, "*2\r\n\$9\r\nSUBSCRIBE\r\n\$26\r\ncafeteria:pedidos:novo\r\n");
+// Envia SUBSCRIBE (comprimento do canal deve ser 22)
+fwrite($socket, "*2\r\n\$9\r\nSUBSCRIBE\r\n\$22\r\ncafeteria:pedidos:novo\r\n");
 
 $buffer = '';
 
