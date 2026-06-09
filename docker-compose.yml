@@ -146,6 +146,24 @@ services:
     networks:
       - cafeteria_network
 
+  # ── WebSocket server (worker) ─────────────────────────────────────────────
+  # Serviço separado que executa o processo PHP WebSocket (server.php).
+  ws:
+    image: dev-jonathan-app
+    container_name: cafeteria_ws
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - app
+    command: php /var/www/html/server.php
+    ports:
+      - "8082:8082"
+    volumes:
+      - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
+    networks:
+      - cafeteria_network
+
 
 
 volumes:

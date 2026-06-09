@@ -10,10 +10,6 @@ use Cafeteria\CQRS\Commands\FinalizarPedidoCommand;
 use Cafeteria\Observability\LoggerService;
 use Cafeteria\Observability\MetricsService;
 
-/**
- * Finaliza o pedido com transação e publica evento no Redis Pub/Sub.
- * Instrumentado com Monolog (logs) e Prometheus (métricas) — Aula 11.
- */
 class FinalizarPedidoHandler implements CommandHandlerInterface
 {
     private const CANAL_PEDIDOS = 'cafeteria:pedidos:novo';
@@ -29,7 +25,6 @@ class FinalizarPedidoHandler implements CommandHandlerInterface
         $nome   = $command->nomeUsuario;
         $inicio = microtime(true);
 
-        // Log estruturado — equivale ao _logger.LogInformation do Serilog (.NET)
         LoggerService::info('Finalizando pedido', [
             'usuario'   => $nome,
             'timestamp' => date('c'),
@@ -38,20 +33,16 @@ class FinalizarPedidoHandler implements CommandHandlerInterface
         $this->conn->beginTransaction();
 
         try {
-            // 1. Busca itens do carrinho
             $sel = $this->conn->prepare("SELECT * FROM tabela WHERE Nome = :nome");
             $sel->execute([':nome' => $nome]);
             $itens = $sel->fetchAll(PDO::FETCH_ASSOC);
 
             if (empty($itens)) {
                 $this->conn->rollBack();
-                LoggerService::warning('Tentativa de finalizar carrinho vazio', [
-                    'usuario' => $nome,
-                ]);
+                LoggerService::warning('Tentativa de finalizar carrinho vazio', ['usuario' => $nome]);
                 throw new \RuntimeException("Carrinho vazio — nada a finalizar.");
             }
 
-            // 2. Insere em Finalizado
             $ins = $this->conn->prepare(
                 "INSERT INTO Finalizado (Produto, Valor, Imagem, Nome)
                  VALUES (:produto, :valor, :imagem, :nome)"
@@ -68,31 +59,51 @@ class FinalizarPedidoHandler implements CommandHandlerInterface
                 $total += (float)($item['valor'] ?? $item['Valor']);
             }
 
-            // 3. Limpa carrinho
             $del = $this->conn->prepare("DELETE FROM tabela WHERE Nome = :nome");
             $del->execute([':nome' => $nome]);
 
             $this->conn->commit();
 
+            // ── Baixa no estoque ──────────────────────────────────────────
+            // Feito fora da transação principal para não bloquear o pedido
+            // caso o produto não exista no estoque ainda.
+            foreach ($itens as $item) {
+                $produto = $item['produto'] ?? $item['Produto'];
+                try {
+                    $patch = $this->conn->prepare(
+                        "UPDATE Estoque SET quantidade = quantidade - 1
+                         WHERE produto = :produto AND quantidade > 0"
+                    );
+                    $patch->execute([':produto' => $produto]);
+
+                    if ($patch->rowCount() === 0) {
+                        LoggerService::warning('Produto não encontrado ou sem estoque', [
+                            'produto' => $produto,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    // Loga mas não cancela o pedido por falha de estoque
+                    LoggerService::error('Falha ao dar baixa no estoque', [
+                        'produto'   => $produto,
+                        'exception' => $e->getMessage(),
+                    ]);
+                }
+            }
+
             $duracao = microtime(true) - $inicio;
 
-            // ── Métricas Prometheus ────────────────────────────────────────
-            // Equivalente ao _pedidosCounter.Inc() do prometheus-net
             MetricsService::incrementarPedidosCriados('Finalizado');
             MetricsService::registrarLatenciaPedido($duracao);
 
-            // ── Log de sucesso ─────────────────────────────────────────────
             LoggerService::info('Pedido finalizado com sucesso', [
-                'usuario'     => $nome,
-                'itens'       => count($itens),
-                'total'       => round($total, 2),
-                'duracao_ms'  => round($duracao * 1000, 2),
+                'usuario'    => $nome,
+                'itens'      => count($itens),
+                'total'      => round($total, 2),
+                'duracao_ms' => round($duracao * 1000, 2),
             ]);
 
-            // 4. Invalida cache do carrinho
             $this->redis->invalidarCarrinho($nome);
 
-            // 5. Publica evento no Redis Pub/Sub → painel Admin via WebSocket
             $this->redis->publicarEvento(self::CANAL_PEDIDOS, [
                 'tipo'    => 'novo_pedido',
                 'usuario' => $nome,
@@ -102,9 +113,8 @@ class FinalizarPedidoHandler implements CommandHandlerInterface
             ]);
 
         } catch (\Throwable $e) {
-            $this->conn->rollBack();
+            if ($this->conn->inTransaction()) $this->conn->rollBack();
 
-            // Log de erro estruturado — equivale ao _logger.LogError do Serilog
             LoggerService::error('Erro ao finalizar pedido', [
                 'usuario'   => $nome,
                 'exception' => $e->getMessage(),
@@ -112,7 +122,6 @@ class FinalizarPedidoHandler implements CommandHandlerInterface
             ]);
 
             MetricsService::incrementarErroDependencia('postgres');
-
             throw $e;
         }
     }
